@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* General Reset */
+        * {
+            box-sizing: border-box;
+        }
+
+        section {
+            background: #F4F4F4;
+            padding: 50px 0;
+        }
+
+        .container {
+            max-width: 1044px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Carousel container */
+        .carousel {
+            display: block;
+            position: relative;
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+
+        /* Individual slides */
+        .carousel__slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .carousel__slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .carousel__slide img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        /* Navigation buttons */
+        .button {
+            background-color: #b9b9b9;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .button.left {
+            left: 10px;
+        }
+
+        .button.right {
+            right: 10px;
+        }
+
+        .carousel__thumbnails {
+            display: flex;
+            justify-content: space-between;
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .carousel__thumbnails img {
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .carousel__thumbnails img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container">
+            <div class="carousel">
+                <!-- Navigation buttons -->
+                <div class="button left" onclick="moveSlide(-1)">&#10094;</div>
+                <div class="button right" onclick="moveSlide(1)">&#10095;</div>
+
+                <!-- Slides container -->
+                <ul class="carousel__slides" id="carouselSlides">
+                    <!-- Dynamically filled by JS -->
+                </ul>
+
+                <!-- Thumbnails -->
+                <ul class="carousel__thumbnails" id="bottomImageContainer">
+                    <!-- Dynamically filled by JS -->
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        let currentSlide = 0;
+        let slidesData = [];
+    
+        // Pass JSON data from Jinja template to JS
+        slidesData = JSON.parse('{{ data | tojson | safe | escapejs }}');
+
+    
+        function renderCarousel() {
+            const slidesContainer = document.getElementById('carouselSlides');
+            const thumbnailsContainer = document.getElementById('bottomImageContainer');
+    
+            // Clear slides and thumbnails
+            slidesContainer.innerHTML = '';
+            thumbnailsContainer.innerHTML = '';
+    
+            // Dynamically build slides and thumbnails
+            slidesData.forEach((item, index) => {
+                const slide = document.createElement('li');
+                slide.className = 'carousel__slide';
+                slide.innerHTML = `<img src="${item.imageUrl}" alt="${item.title}">`;
+                slidesContainer.appendChild(slide);
+    
+                const thumb = document.createElement('li');
+                const img = document.createElement('img');
+                img.src = item.imageUrl;
+                img.alt = item.title;
+                img.onclick = () => goToSlide(index);
+                thumb.appendChild(img);
+                thumbnailsContainer.appendChild(thumb);
+            });
+    
+            updateCarouselPosition();
+        }
+    
+        function updateCarouselPosition() {
+            const slideWidth = document.querySelector('.carousel__slide')?.offsetWidth || 0;
+            const slideContainer = document.getElementById('carouselSlides');
+            slideContainer.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+        }
+    
+        function moveSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = slidesData.length - 1; // Wrap left
+            if (currentSlide >= slidesData.length) currentSlide = 0; // Wrap right
+            updateCarouselPosition();
+        }
+    
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarouselPosition();
+        }
+    
+        window.onload = () => {
+            renderCarousel();
+            window.addEventListener('resize', updateCarouselPosition);
+        };
+    </script>
+    
+    
+</body>
+
+</html>

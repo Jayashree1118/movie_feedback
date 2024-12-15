@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .movie-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .movie-card img {
+            max-width: 150px;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+
+        .movie-info {
+            flex: 1;
+        }
+
+        .movie-info h2 {
+            margin: 0 0 10px;
+        }
+
+        .movie-info p {
+            margin: 0 0 5px;
+        }
+
+        .movie-info a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .movie-info a:hover {
+            background: #0056b3;
+        }
+
+        .fallback-image {
+            width: 150px;
+            height: 225px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔥💥Movies List💥🔥</h1>
+        {% for item in data %}
+        <div class="movie-card">
+            {% if item.image_url %}
+                <img src="{{ item.image_url }}" alt="Movie Image">
+            {% else %}
+                <div class="fallback-image">No Image Available</div>
+            {% endif %}
+            <div class="movie-info">
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.description }}</p>
+                <p>Rating: {{ item.avg_rating }}</p>
+                <a href="/feedback?id={{ item.id }}&name={{ item.title }}">Give Feedback</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>

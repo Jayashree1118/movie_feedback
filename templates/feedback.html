@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give Feedback</title>
+    <style>
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .conatiner {
+            width: 80%;
+            height: 80%;
+        }
+
+        input {
+            border-radius: 5px;
+            border-width: 1px;
+            padding: 5px 10px;
+        }
+
+        textarea {
+            padding-left: 10px;
+            padding-top: 5px;
+            border-radius: 10px;
+        }
+
+        .submit-button {
+            background-color: aquamarine;
+            border: 0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #4b4848;
+        }
+
+        #start-container {
+            margin: 0;
+            padding: 0;
+        }
+
+        .rate {
+            float: left;
+            height: 46px;
+            padding: 0 10px;
+        }
+
+        .rate:not(:checked)>input {
+            position: absolute;
+            top: -9999px;
+        }
+
+        .rate:not(:checked)>label {
+            float: right;
+            width: 1em;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 30px;
+            color: #ccc;
+        }
+
+        .rate:not(:checked)>label:before {
+            content: '★ ';
+        }
+
+        .rate>input:checked~label {
+            color: #ffc700;
+        }
+
+        .rate:not(:checked)>label:hover,
+        .rate:not(:checked)>label:hover~label {
+            color: #deb217;
+        }
+
+        .rate>input:checked+label:hover,
+        .rate>input:checked+label:hover~label,
+        .rate>input:checked~label:hover,
+        .rate>input:checked~label:hover~label,
+        .rate>label:hover~input:checked~label {
+            color: #c59b08;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Feedback for <span id="movieTitle">{{data}}</span></h1>
+
+    <!-- <form action="feedback" method="POST">
+    </form> -->
+    <!-- <input type="hidden" id="movieInput" name="movie" value=""> -->
+    <div class="container">
+
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="rating">Rating:</label><br>
+        <div class="rate" id="star-container">
+            <input type="radio" id="star5" name="rate" value="5" />
+            <label for="star5" title="text">5 stars</label>
+            <input type="radio" id="star4" name="rate" value="4" />
+            <label for="star4" title="text">4 stars</label>
+            <input type="radio" id="star3" name="rate" value="3" />
+            <label for="star3" title="text">3 stars</label>
+            <input type="radio" id="star2" name="rate" value="2" />
+            <label for="star2" title="text">2 stars</label>
+            <input type="radio" id="star1" name="rate" value="1" />
+            <label for="star1" title="text">1 star</label>
+        </div><br/>
+        
+        <textarea 
+            id="feedback" 
+            name="feedback" 
+            rows="4" 
+            cols="50" 
+            placeholder="Share detials of your experiance"
+            required
+        ></textarea><br><br>
+
+        <button type="submit" class="submit-button" onclick="onSubmit()">Submit</button>
+    </div>
+
+    <script type="text/javascript">
+        window.onload(()=>{
+            document.getElementById("movieTitle").innerHTML = document.location.href.split("name=")[1];
+        })
+
+        function onSubmit() {
+            let rating = 0;
+            const rateElements = document.getElementsByName("rate");
+            rateElements.forEach((element) => {
+                if (element.checked) {
+                    rating = parseInt(element.value);
+                }
+            })
+
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let feedback = document.getElementById("feedback").value;
+
+            const currentUrl = document.location.href;
+            const movieName = currentUrl.split('name=')[1];
+            const movieId = currentUrl.split("id=")[1].split("&")[0]
+
+            fetch("http://127.0.0.1:5000/feedback", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    feedback,
+                    rating,
+                    movie_name: decodeURIComponent(movieName),
+                    id: movieId
+                })
+            }).then(() => {
+                // alert("Feedback submitted successfully");
+                const currentUrl = document.location.href.split('?id=')[0];
+                document.location.href = currentUrl.replace('feedback', 'thank-you');
+            }).catch((error) => {
+                alert("Feedback submitted successfully");
+                console.error(error);
+            })
+        }
+    </script>
+</body>
+
+</html>
